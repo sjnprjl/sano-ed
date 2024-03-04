@@ -17,6 +17,7 @@ typedef enum EventAction {
   AC_CharAdd,
   AC_MoveLeft,
   AC_MoveRight,
+  AC_BackSpace,
 } EventAction;
 
 typedef struct _GapBuffer {
@@ -68,4 +69,7 @@ void editor_move_left(Editor *ed);
 void editor_move_right(Editor *ed);
 void iter_lines(Line *line, void (*proc)(char, int, int));
 void editor_update(Editor *ed);
+void editor_delete_char(Editor *ed);
+void try_gap_shift(GapBuffer *gbuf, unsigned int at);
+void line_delete_char(Line *, unsigned int at);
 #endif // !SANO_H

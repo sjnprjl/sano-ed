@@ -38,6 +38,8 @@ EventAction handle_key_event(int key) {
     return AC_MoveRight;
   } else if (key == '\n') {
     return AC_NewLine;
+  } else if (key == KEY_BACKSPACE) {
+    return AC_BackSpace;
   }
 
   return AC_CharAdd;
@@ -68,8 +70,16 @@ void updater(char ch, int y, int x) {
 }
 
 void editor_update(Editor *ed) {
+  clear();
   iter_lines(ed->line_head, updater);
   move(ed->cursor_y, ed->cursor_x);
 
+  //
+}
+void editor_delete_char(Editor *ed) {
+  if (ed->cursor_x != 0) {
+    line_delete_char(ed->current_line, ed->cursor_x);
+    ed->cursor_x--;
+  }
   //
 }

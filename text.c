@@ -147,6 +147,15 @@ void free_only_this_line(Line *this) {
   FREE(this);
 }
 
+void line_delete_char(Line *this, unsigned int at) {
+  /* subtracting start will act as the character is deleted. */
+  if (at != 0) {
+    try_gap_shift(this->data, at);
+    if (this->data->start != 0)
+      this->data->start--;
+  }
+}
+
 static inline void relate_two_adj_nodes(Line *behind, Line *next_to_behind) {
 
   if (!behind || !next_to_behind)
