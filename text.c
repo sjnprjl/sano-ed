@@ -33,12 +33,13 @@ char get_buf_next_char(GapBuffer *buf, int index) {
   int gap = buf->end - buf->start;
   if (index < 0)
     return '\0';
-  if (index <= (signed)buf->start)
+  if (index < (signed)buf->start)
     return buf->data[index];
 
-  if ((unsigned int long)(index + gap - 1) > buf->length)
+  /* TODO!: this might break? */
+  if ((unsigned int long)(index + gap) > buf->length)
     return '\0';
-  return buf->data[index + gap - 1];
+  return buf->data[index + gap];
 }
 
 void iter_buffer(GapBuffer *buf, void (*proc)(char, int)) {
