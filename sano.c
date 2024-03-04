@@ -38,13 +38,17 @@ int main(int argc, char **argv) {
     case AC_BackSpace:
       editor_delete_char(&ed);
       break;
+    case AC_MoveUp:
+      editor_move_up(&ed);
+      break;
+    case AC_MoveDown:
+      editor_move_down(&ed);
+      break;
     case _WAIT:
       break;
     }
 
-    refresh();
     editor_update(&ed);
-
     refresh();
   }
 

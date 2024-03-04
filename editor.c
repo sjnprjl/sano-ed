@@ -40,6 +40,10 @@ EventAction handle_key_event(int key) {
     return AC_NewLine;
   } else if (key == KEY_BACKSPACE) {
     return AC_BackSpace;
+  } else if (key == KEY_UP) {
+    return AC_MoveUp;
+  } else if (key == KEY_DOWN) {
+    return AC_MoveDown;
   }
 
   return AC_CharAdd;
@@ -52,9 +56,16 @@ void editor_move_left(Editor *ed) {
 }
 
 void editor_move_up(Editor *ed) {
-  if (ed->cursor_y != 0) {
+  if (ed->cursor_y != 0 && ed->current_line->prev) {
     ed->cursor_y--;
     ed->current_line = ed->current_line->prev;
+  }
+}
+
+void editor_move_down(Editor *ed) {
+  if (ed->current_line->next) {
+    ed->cursor_y++;
+    ed->current_line = ed->current_line->next;
   }
 }
 
