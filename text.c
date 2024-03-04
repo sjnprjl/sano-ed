@@ -76,8 +76,10 @@ void try_gap_shift(GapBuffer *gbuf, unsigned int at) {
     gbuf->end -= delta;
   } else if (at > gbuf->start && at + gap - 1 < gbuf->length) {
     const int unsigned pos = at + gap - 1;
-    const int delta = gbuf->end - pos;
-    memcpy(&gbuf->data[gbuf->start], &gbuf->data[pos], delta);
+
+    /*  think!: pos is always going to be greater than gbuf->end?  */
+    const int delta = (signed int)(pos - gbuf->end) + 1; //?;
+    memcpy(&gbuf->data[gbuf->start], &gbuf->data[gbuf->end], delta);
     gbuf->start += delta;
     gbuf->end += delta;
   }
@@ -92,7 +94,7 @@ void grow_gap_buffer(GapBuffer *gbuf) {
 
   char *b = realloc(gbuf->data, new_size);
 
-  if (!b) {
+  if (b == NULL) {
     printf("Could not reallocate. Do not have sufficient RAM\n");
     exit(1);
   }
@@ -107,7 +109,7 @@ void grow_gap_buffer(GapBuffer *gbuf) {
 
 void insert_into_gap_buffer_at(GapBuffer *gbuf, unsigned int at, char ch) {
 
-  if (gbuf->end - gbuf->start <= 0) {
+  if ((signed int)(gbuf->end - gbuf->start) <= 0) {
     grow_gap_buffer(gbuf);
   }
 
