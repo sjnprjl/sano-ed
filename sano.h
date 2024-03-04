@@ -22,8 +22,10 @@ typedef enum EventAction {
   AC_MoveDown,
 } EventAction;
 
+
 typedef struct _GapBuffer {
   char *data;
+
   unsigned int start;
   unsigned int end;
 
@@ -36,44 +38,72 @@ typedef struct Node {
 
   struct Node *prev;
   struct Node *next;
-
 } Line;
 
 typedef struct _Editor {
-
   Line *line_head;
-
   Line *current_line;
 
   unsigned int line_length;
-
   unsigned int cursor_x;
+  unsigned int cursor_y; /* current line  */
 
-  /* current line  */
-  unsigned int cursor_y;
-
+  Viewport *viewport;
 } Editor;
 
-/* func def*/
+/* ==============
+ * | Gap Buffer |
+ * ==============
+ * */
+void try_gap_shift(GapBuffer *gbuf, unsigned int at);
+
+/*
+ * =================================
+ * |          Line                 |
+ * =================================
+ *
+ * */
 
 Line *create_new_line();
-Editor init_editor();
-
-void insert_char_into_line_at(Line *line, unsigned int cursor_pos, char ch);
-EventAction handle_key_event(int key);
-void editor_insert_char(Editor *ed, char ch);
-
-/* create new line and return pointer to it. */
+Line *add_line_after_to(Line *current);
 Line *add_line_after_to(Line *current);
 
+void iter_lines(Line *line, void (*proc)(char, int, int));
+void line_delete_char(Line *, unsigned int at);
+void insert_char_into_line_at(Line *line, unsigned int cursor_pos, char ch);
+
+unsigned int ln_get_len(Line *ln);
+
+/*
+ * =================================
+ * |         Editor                |
+ * =================================
+ *
+ * */
+Editor init_editor();
+
+void editor_insert_char(Editor *ed, char ch);
 void editor_add_new_line(Editor *ed);
 void editor_move_left(Editor *ed);
 void editor_move_right(Editor *ed);
 void editor_move_down(Editor *ed);
 void editor_move_up(Editor *ed);
-void iter_lines(Line *line, void (*proc)(char, int, int));
 void editor_update(Editor *ed);
 void editor_delete_char(Editor *ed);
-void try_gap_shift(GapBuffer *gbuf, unsigned int at);
-void line_delete_char(Line *, unsigned int at);
+void editor_load_from_file(Editor *ed, FILE *file);
+void ed_movexy(Editor *ed, unsigned int y, unsigned int x);
+
+/*
+ * ===========
+ * | Viewport|
+ * ==========
+ * */
+
+/*
+ * ===========
+ * | Action |
+ * ==========
+ * */
+
+EventAction handle_key_event(int key);
 #endif // !SANO_H
