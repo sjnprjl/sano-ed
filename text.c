@@ -24,9 +24,25 @@ GapBuffer *create_new_gap_buf(unsigned long size) {
   return gap_buf;
 }
 
-int get_buffer_total_filled_len(GapBuffer *buf) {
+int get_buffer_total_filled_len(const GapBuffer *buf) {
   int gap = buf->end - buf->start;
   return buf->length - gap;
+}
+
+char *get_buf_as_str(GapBuffer *buf) {
+  const size_t size = get_buffer_total_filled_len(buf) * sizeof(char) + 1;
+  char *str = malloc(size);
+  if (buf->start > 0) {
+    memcpy(&str[0], &buf->data[0], buf->start);
+  }
+  if (buf->end < buf->length) {
+    memcpy(&str[buf->start], &buf->data[buf->end],
+           buf->length - (unsigned long)(buf->end));
+  }
+
+  str[size - 1] = '\0';
+
+  return str;
 }
 
 char get_buf_next_char(GapBuffer *buf, int index) {
@@ -48,21 +64,6 @@ void iter_buffer(GapBuffer *buf, void (*proc)(char, int)) {
   char ch;
   while ((ch = get_buf_next_char(buf, index))) {
     proc(ch, index++);
-  }
-}
-
-void iter_lines(Line *head, void (*proc)(char ch, int y, int x)) {
-  int y = 0;
-  int x = 0;
-  while (head) {
-    int index = 0;
-    char ch;
-    while ((ch = get_buf_next_char(head->data, index++))) {
-      proc(ch, y, x++);
-    }
-    head = head->next;
-    y++;
-    x = 0;
   }
 }
 
@@ -192,4 +193,8 @@ void delete_line(Line *this) {
   Line *next_line = this->next;
   relate_two_adj_nodes(prev_line, next_line);
   free_only_this_line(this);
+}
+
+unsigned int ln_get_len(Line *ln) {
+  return get_buffer_total_filled_len(ln->data);
 }

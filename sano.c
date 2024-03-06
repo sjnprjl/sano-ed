@@ -1,21 +1,47 @@
 #include "sano.h"
 #include <ncurses.h>
 #include <stdio.h>
+#include <stdlib.h>
+
+// void print_line(char c, int y, int x) {
+//
+//   printf("%c", c);
+//   //
+// }
 
 int main(int argc, char **argv) {
 
-  (void)argc;
-  (void)argv;
-
-  Editor ed = init_editor();
+  FILE *fd = NULL;
+  if (argc == 2) {
+    //
+    char *file_path = argv[1];
+    fd = fopen(file_path, "r");
+    if (!fd) {
+      perror("Could not open file");
+      exit(1);
+    }
+  }
 
   int ch;
   initscr();
   keypad(stdscr, true);
   raw();
   noecho();
+  mousemask(BUTTON1_PRESSED, NULL);
+
+  Editor ed = init_editor();
+
+  if (fd != NULL) {
+    editor_load_from_file(&ed, fd);
+  }
+  Viewport vp = {0};
+  getmaxyx(stdscr, vp.height, vp.width);
+  /*  TODO! */
+  ed.viewport = &vp;
+  editor_update(&ed);
 
   EventAction action = _WAIT;
+  MEVENT event;
   while (action != AC_Quit && (ch = getch())) {
     action = handle_key_event(ch);
     switch (action) {
@@ -46,16 +72,26 @@ int main(int argc, char **argv) {
       break;
     case _WAIT:
       break;
+    case AC_MouseEv:
+      // if (getmouse(&event) == OK) {
+      //   if (event.bstate & BUTTON1_PRESSED) {
+      //     //
+      //     ed_movexy(&ed, event.y, event.x);
+      //   }
+      // }
+      break;
     }
 
+    scroll_viewport_if_possible(&vp, ed.cursor_y, ed.cursor_x);
     editor_update(&ed);
     refresh();
   }
 
-  printf("%s", ed.current_line->data->data);
-
+  //
   echo();
   endwin();
+  // printf("viewport height: %ld\n", vp.v_f_height);
+  editor_dump(&ed);
 
   return 0;
 }
