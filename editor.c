@@ -22,7 +22,7 @@ void editor_insert_char(Editor *ed, char ch) {
 }
 
 void editor_add_new_line(Editor *ed) {
-  Line *new_line = add_line_after_to(ed->current_line);
+  Line *new_line = add_line_after_crfc(ed->current_line, ed->cursor_x);
   ed->current_line = new_line;
   ed->cursor_y++;
   ed->cursor_x = 0;
@@ -83,11 +83,22 @@ void editor_move_down(Editor *ed) {
 }
 
 void ed_movexy(Editor *ed, unsigned int y, unsigned int x) {
+
+  unsigned int delta = y < ed->cursor_y ? ed->cursor_y - y : y - ed->cursor_y;
+  if (y < ed->cursor_y) {
+    while (delta-- && ed->current_line) {
+      ed->current_line = ed->current_line->prev;
+    }
+    ed->cursor_y = y;
+  } else if (y > ed->cursor_y) {
+    while (delta-- && ed->current_line) {
+      ed->current_line = ed->current_line->next;
+    }
+    ed->cursor_y = y;
+  }
   ed->cursor_x = x;
   ed_cursor_clamp(ed);
-  (void)(y);
-
-  // ed->cursor_y = y;
+  move(ed->cursor_y, ed->cursor_x);
 }
 
 void editor_move_right(Editor *ed) {
@@ -124,11 +135,7 @@ void editor_update(Editor *ed) {
     free(str);
     line = line->next;
   }
-
   move(y, x);
-  refresh();
-
-  //
 }
 void editor_delete_char(Editor *ed) {
   if (ed->cursor_x != 0) {
@@ -142,7 +149,7 @@ void editor_load_from_file(Editor *ed, FILE *file) {
   char ch;
   while ((ch = getc(file)) != EOF) {
     if (ch == '\n') {
-      add_line_after_to(ed->current_line);
+      add_line_after(ed->current_line);
       editor_move_down(ed);
       ed->cursor_x = 0;
       //

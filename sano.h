@@ -3,10 +3,8 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <sys/types.h>
-#ifndef INIT_GAP_BUF_SIZE
 #define INIT_GAP_BUF_SIZE 256
-// #define INIT_GAP_BUF_SIZE 10
-#endif
+#define internal static
 
 #define FREE(ptr)                                                              \
   do {                                                                         \
@@ -77,8 +75,9 @@ char *get_buf_as_str(GapBuffer *buf);
  * */
 
 Line *create_new_line();
-Line *add_line_after_to(Line *current);
-Line *add_line_after_to(Line *current);
+Line *add_line_after(Line *current);
+Line *add_line_before(Line *current);
+Line *add_line_after_crfc(Line *current, unsigned int);
 
 void line_delete_char(Line *, unsigned int at);
 void insert_char_into_line_at(Line *line, unsigned int cursor_pos, char ch);

@@ -3,12 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// void print_line(char c, int y, int x) {
-//
-//   printf("%c", c);
-//   //
-// }
-
 int main(int argc, char **argv) {
 
   FILE *fd = NULL;

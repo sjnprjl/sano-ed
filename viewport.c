@@ -3,8 +3,7 @@
 #define _width(viewport) (viewport->x + viewport->width)
 #define _height(viewport) (viewport->y + viewport->height)
 #define _is_inside_viewport_x(viewport, x) (x >= vp->x && x <= _width(viewport))
-#define _is_inside_viewport_y(viewport, y)                                     \
-  (y >= vp->y && y <= _height(viewport))
+#define _is_inside_viewport_y(viewport, y) (y >= vp->y && y < _height(viewport))
 
 int is_inside_viewport(Viewport *vp, u_int64_t y, u_int64_t x) {
   return _is_inside_viewport_y(vp, y) && _is_inside_viewport_x(vp, x);

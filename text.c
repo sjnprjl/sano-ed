@@ -24,6 +24,8 @@ GapBuffer *create_new_gap_buf(unsigned long size) {
   return gap_buf;
 }
 
+internal void point_end_to_eol(GapBuffer *buf) { buf->end = buf->length; }
+
 int get_buffer_total_filled_len(const GapBuffer *buf) {
   int gap = buf->end - buf->start;
   return buf->length - gap;
@@ -176,7 +178,7 @@ void add_line_prev_to(Line *current) {
     relate_two_adj_nodes(old_prev, to_insert);
 }
 
-Line *add_line_after_to(Line *current) {
+Line *add_line_after(Line *current) {
   Line *old_next = current->next;
   Line *to_insert = create_new_line();
 
@@ -186,6 +188,21 @@ Line *add_line_after_to(Line *current) {
     relate_two_adj_nodes(to_insert, old_next);
   }
   return to_insert;
+}
+
+/*
+ * add line and copy rest of text to next line from the cursor
+ * */
+Line *add_line_after_crfc(Line *current, unsigned int cursor_pos) {
+  Line *next_line = add_line_after(current);
+  try_gap_shift(current->data, cursor_pos);
+  unsigned int n = current->data->length - current->data->end;
+  memcpy(&next_line->data->data[0], &current->data->data[current->data->end],
+         n);
+  next_line->data->start = n;
+  next_line->data->end = next_line->data->length;
+  point_end_to_eol(current->data);
+  return next_line;
 }
 
 void delete_line(Line *this) {
